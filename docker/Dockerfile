@@ -26,7 +26,7 @@ WORKDIR /workspace
 COPY . /workspace
 
 # 5. 종속성 설치
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir poetry && poetry install
 
 # 6. Python 앱 실행
-CMD ["python", "app"]
+CMD ["poetry", "run", "python", "app"]
