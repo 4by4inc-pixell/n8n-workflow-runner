@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  n8n-workflow-runner:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${port}:${port}"
+    environment:
+      host: "${host}"
+      port: "${port}"
+      n8n_base_url: "${n8n_base_url}"
+      github_id: "${github_id}"
+      github_token: "${github_token}"
+      github_nvidia_processor_url: "${github_nvidia_processor_url}"
+      DATABASE_URL: "${DATABASE_URL}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
+      MLFLOW_TRACKING_URI: "${MLFLOW_TRACKING_URI}"
+      MLFLOW_REGISTRY_URI: "${MLFLOW_REGISTRY_URI}"
+    command: ["python", "app/main.py"]
