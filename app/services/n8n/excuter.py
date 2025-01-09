@@ -37,7 +37,6 @@ class N8NTaskExecutionService:
                 result = None
                 status = False
                 try:
-                    await N8NTaskRepository.delete_task(task_id=task.id, db=session)
                     result = str(await self.execute_task(task))
                     status = True
                 except Exception as e:
@@ -53,6 +52,7 @@ class N8NTaskExecutionService:
                         result=result,
                         db=session,
                     )
+                    await N8NTaskRepository.delete_task(task_id=task.id, db=session)
 
     async def execute_task(self, task: N8NTaskRead):
         print(

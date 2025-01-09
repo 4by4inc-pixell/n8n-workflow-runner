@@ -7,7 +7,7 @@ import shutil
 from services.work.base import WorkBase
 
 
-@ray.remote(num_cpus=4, num_gpus=1)
+@ray.remote(num_cpus=2, num_gpus=1)
 def _task(params: dict):
     print(f"ray get {params}")
     package_dir = os.environ["PYTHONPATH"]
@@ -29,21 +29,26 @@ def _subprocess_runner(params: dict):
         params["github_id"] = settings.github_id
         params["github_token"] = settings.github_token
         params["github_nvidia_processor_url"] = settings.github_nvidia_processor_url
+        runtime_env = {
+            "pip": ["pms-model-manager"],
+            "env_vars": {
+                "PYTHONPATH": f"/workspace/workflow.nvidia-processor",
+                "MLFLOW_TRACKING_URI": settings.MLFLOW_TRACKING_URI,
+                "MLFLOW_REGISTRY_URI": settings.MLFLOW_REGISTRY_URI,
+                "AWS_ACCESS_KEY_ID": settings.AWS_ACCESS_KEY_ID,
+                "AWS_SECRET_ACCESS_KEY": settings.AWS_SECRET_ACCESS_KEY,
+                "AWS_DEFAULT_REGION": settings.AWS_DEFAULT_REGION,
+            },
+        }
+        # print(f"runtime_env: {runtime_env}")
         ray.init(
             f"ray://{params['address']}:{params['port']}",
-            runtime_env={
-                "pip": ["pms-model-manager"],
-                "env_vars": {
-                    "PYTHONPATH": f"/workspace/workflow.nvidia-processor",
-                    "MLFLOW_TRACKING_URI": settings.MLFLOW_TRACKING_URI,
-                    "MLFLOW_REGISTRY_URI": settings.MLFLOW_REGISTRY_URI,
-                    "AWS_ACCESS_KEY_ID": settings.AWS_ACCESS_KEY_ID,
-                    "AWS_SECRET_ACCESS_KEY": settings.AWS_SECRET_ACCESS_KEY,
-                    "AWS_DEFAULT_REGION": settings.AWS_DEFAULT_REGION,
-                },
-            },
+            runtime_env=runtime_env,
         )
-        ray.get(_task.remote(params))
+        if "resources" in params:
+            ray.get(_task.options(resources=params["resources"]).remote(params))
+        else:
+            ray.get(_task.remote(params))
         ray.shutdown()
         return (True, "success")
     except Exception as e:
