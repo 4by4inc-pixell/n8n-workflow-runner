@@ -8,8 +8,8 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
-ray = {version = "2.24", extras = ["client"]}
+python = "3.12.*"
+ray = {version = "2.40", extras = ["client"]}
 loguru = "^0.7.3"
 pydantic-settings = "^2.7.1"
 tomli = "^2.2.1"

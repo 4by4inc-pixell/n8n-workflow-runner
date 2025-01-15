@@ -1,5 +1,5 @@
 # 1. 경량화된 Python 3.10 이미지를 기반으로 사용
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # 2. 필수 종속성 설치
 RUN apt-get update && apt-get install -y --no-install-recommends \
